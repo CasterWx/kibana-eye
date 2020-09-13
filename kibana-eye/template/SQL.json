@@ -1,0 +1,93 @@
+{
+  "query": {
+    "bool": {
+      "must": {
+        "query_string": {
+          "analyze_wildcard": "true",
+          "minimum_should_match": "100%",
+          "query": "${application_query_condition}"
+        }
+      },
+      "filter": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "gte": "${gte}",
+                  "lte": "${lte}",
+                  "format": "epoch_millis"
+                }
+              }
+            }
+          ],
+          "must_not": [
+
+          ]
+        }
+      }
+    }
+  },
+  "size": 0,
+  "aggs": {
+    "2": {
+      "terms": {
+        "field": "query_table",
+        "size": 50,
+        "order": {
+          "_count": "desc"
+        }
+      },
+      "aggs": {
+        "3": {
+          "filters": {
+            "filters": {
+              "total": {
+                "query_string": {
+                  "query": "*",
+                  "analyze_wildcard": "true",
+                  "minimum_should_match": "100%"
+                }
+              },
+              "100ms": {
+                "query_string": {
+                  "query": "process_time:<100",
+                  "analyze_wildcard": "true",
+                  "minimum_should_match": "100%"
+                }
+              },
+              "100-200ms": {
+                "query_string": {
+                  "query": "process_time:[100 TO 200]",
+                  "analyze_wildcard": "true",
+                  "minimum_should_match": "100%"
+                }
+              },
+              "200-500ms": {
+                "query_string": {
+                  "query": "process_time:[200 TO 500]",
+                  "analyze_wildcard": "true",
+                  "minimum_should_match": "100%"
+                }
+              },
+              "500-1000ms": {
+                "query_string": {
+                  "query": "process_time:[500 TO 1000]",
+                  "analyze_wildcard": "true",
+                  "minimum_should_match": "100%"
+                }
+              },
+              ">1s": {
+                "query_string": {
+                  "query": "process_time:>1000",
+                  "analyze_wildcard": "true",
+                  "minimum_should_match": "100%"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
