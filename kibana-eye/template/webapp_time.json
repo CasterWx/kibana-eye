@@ -1,0 +1,104 @@
+{
+  "size": 0,
+  "aggs": {
+    "2": {
+      "terms": {
+        "field": "log_uuid",
+        "size": 200,
+        "order": {
+          "_count": "desc"
+        }
+      },
+      "aggs": {
+        "3": {
+          "filters": {
+            "filters": {
+              "Total": {
+                "query_string": {
+                  "query": "*",
+                  "analyze_wildcard": "true",
+                  "minimum_should_match": "100%"
+                }
+              },
+              "0~200ms": {
+                "query_string": {
+                  "query": "request_time:<0.2",
+                  "analyze_wildcard": "true",
+                  "minimum_should_match": "100%"
+                }
+              },
+              "201~500ms": {
+                "query_string": {
+                  "query": "request_time:[0.201 TO 0.5]",
+                  "analyze_wildcard": "true",
+                  "minimum_should_match": "100%"
+                }
+              },
+              "501~1000s": {
+                "query_string": {
+                  "query": "request_time:[0.501 TO 1]",
+                  "analyze_wildcard": "true",
+                  "minimum_should_match": "100%"
+                }
+              },
+              ">1s": {
+                "query_string": {
+                  "query": "request_time:>1",
+                  "analyze_wildcard": "true",
+                  "minimum_should_match": "100%"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "query": {
+    "bool": {
+      "must": {
+        "query_string": {
+          "query": "${application_query_condition}",
+          "analyze_wildcard": "true",
+          "minimum_should_match": "100%"
+        }
+      },
+      "filter": {
+        "bool": {
+          "must": [
+            {
+              "query_string": {
+                "analyze_wildcard": "true",
+                "minimum_should_match": "100%",
+                "query": "*"
+              }
+            },
+            {
+              "range": {
+                "@timestamp": {
+                  "gte": "${gte}",
+                  "lte": "${lte}",
+                  "format": "epoch_millis"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      }
+    }
+  },
+  "highlight": {
+    "pre_tags": [
+      "@kibana-highlighted-field@"
+    ],
+    "post_tags": [
+      "@/kibana-highlighted-field@"
+    ],
+    "fields": {
+      "*": {}
+    },
+    "require_field_match": "false",
+    "fragment_size": 2147483647
+  }
+}

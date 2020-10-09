@@ -1,0 +1,132 @@
+{
+  "size": 0,
+  "aggs": {
+    "4": {
+      "terms": {
+        "field": "log_uuid",
+        "size": 200,
+        "order": {
+          "_count": "desc"
+        }
+      },
+      "aggs": {
+        "5": {
+          "filters": {
+            "filters": {
+              "200": {
+                "query_string": {
+                  "query": "status:200",
+                  "analyze_wildcard": "true",
+                  "minimum_should_match": "100%"
+                }
+              },
+              "302": {
+                "query_string": {
+                  "query": "* AND (status:302 OR status:301)",
+                  "analyze_wildcard": "true",
+                  "minimum_should_match": "100%"
+                }
+              },
+              "400": {
+                "query_string": {
+                  "query": "status:400",
+                  "analyze_wildcard": "true",
+                  "minimum_should_match": "100%"
+                }
+              },
+              "404": {
+                "query_string": {
+                  "query": "status:404",
+                  "analyze_wildcard": "true",
+                  "minimum_should_match": "100%"
+                }
+              },
+              "499": {
+                "query_string": {
+                  "query": "status:499",
+                  "analyze_wildcard": "true",
+                  "minimum_should_match": "100%"
+                }
+              },
+              "500": {
+                "query_string": {
+                  "query": "status:500",
+                  "analyze_wildcard": "true",
+                  "minimum_should_match": "100%"
+                }
+              },
+              "502": {
+                "query_string": {
+                  "query": "status:502",
+                  "analyze_wildcard": "true",
+                  "minimum_should_match": "100%"
+                }
+              },
+              "503": {
+                "query_string": {
+                  "query": "status:503",
+                  "analyze_wildcard": "true",
+                  "minimum_should_match": "100%"
+                }
+              },
+              "Total": {
+                "query_string": {
+                  "query": "*",
+                  "analyze_wildcard": "true",
+                  "minimum_should_match": "100%"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "query": {
+    "bool": {
+      "must": {
+        "query_string": {
+          "query": "${application_query_condition}",
+          "analyze_wildcard": "true",
+          "minimum_should_match": "100%"
+        }
+      },
+      "filter": {
+        "bool": {
+          "must": [
+            {
+              "query_string": {
+                "analyze_wildcard": "true",
+                "minimum_should_match": "100%",
+                "query": "*"
+              }
+            },
+            {
+              "range": {
+                "@timestamp": {
+                  "gte": "${gte}",
+                  "lte": "${lte}",
+                  "format": "epoch_millis"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      }
+    }
+  },
+  "highlight": {
+    "pre_tags": [
+      "@kibana-highlighted-field@"
+    ],
+    "post_tags": [
+      "@/kibana-highlighted-field@"
+    ],
+    "fields": {
+      "*": {}
+    },
+    "require_field_match": "false",
+    "fragment_size": 2147483647
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "size": 0,
+  "query": {
+    "bool": {
+      "must": {
+        "query_string": {
+          "query": "${application_query_condition}",
+          "analyze_wildcard": "true",
+          "minimum_should_match": "100%"
+        }
+      },
+      "filter": {
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "@timestamp": {
+                  "gte": "${gte}",
+                  "lte": "${lte}",
+                  "format": "epoch_millis"
+                }
+              }
+            }
+          ],
+          "must_not": []
+        }
+      }
+    }
+  },
+  "aggs": {
+    "2": {
+      "terms": {
+        "field": "app_name",
+        "size": 200,
+        "order": {
+          "_count": "desc"
+        }
+      },
+      "aggs": {
+        "3": {
+          "terms": {
+            "field": "json.className",
+            "size": 200,
+            "order": {
+              "_count": "desc"
+            }
+          },
+          "aggs": {
+            "4": {
+              "terms": {
+                "field": "json.method",
+                "size": 200,
+                "order": {
+                  "_count": "desc"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
